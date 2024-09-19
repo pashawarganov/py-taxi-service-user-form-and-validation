@@ -57,11 +57,25 @@ class ManufacturerDeleteView(LoginRequiredMixin, generic.DeleteView):
 class CarListView(LoginRequiredMixin, generic.ListView):
     model = Car
     paginate_by = 5
-    queryset = Car.objects.all().select_related("manufacturer")
+    queryset = Car.objects.all().select_related("manufacturer").prefetch_related("drivers")
 
 
 class CarDetailView(LoginRequiredMixin, generic.DetailView):
     model = Car
+
+
+    def post(self, request, *args, **kwargs):
+        car = self.get_object()
+        driver = request.user
+
+        action = request.POST.get("action")
+
+        if action == "Add":
+            car.drivers.add(driver)
+        elif action == "Delete":
+            car.drivers.remove(driver)
+
+        return redirect("taxi:car-detail", pk=car.pk)
 
 
 class CarCreateView(LoginRequiredMixin, generic.CreateView):
@@ -72,7 +86,6 @@ class CarCreateView(LoginRequiredMixin, generic.CreateView):
 
 class CarUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Car
-    form_class = CarForm
     success_url = reverse_lazy("taxi:car-list")
 
 
@@ -105,21 +118,3 @@ class DriverUpdateView(LoginRequiredMixin, generic.UpdateView):
 class DriverDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Driver
     success_url = reverse_lazy("taxi:driver-list")
-
-
-def remove_driver_from_car(request, pk):
-    car = get_object_or_404(Car, pk=pk)
-    driver = request.user
-
-    car.drivers.remove(driver)
-
-    return redirect("taxi:car-detail", pk=pk)
-
-
-def assign_driver_to_car(request, pk):
-    car = get_object_or_404(Car, pk=pk)
-    driver = request.user
-
-    car.drivers.add(driver)
-
-    return redirect("taxi:car-detail", pk=pk)
