@@ -13,8 +13,9 @@ class DriverLicenseUpdateForm(forms.ModelForm):
                 8, message="License number must be 8 characters long"
             ),
             RegexValidator(
-                regex=r'^[A-Z]{3}\d{5}$',
-                message="License number must consist of 3 uppercase letters followed by 5 digits"
+                regex=r"^[A-Z]{3}\d{5}$",
+                message="License number must consist of 3 uppercase letters "
+                        "followed by 5 digits"
             )
         ]
     )
