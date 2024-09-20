@@ -60,12 +60,15 @@ class CarListView(LoginRequiredMixin, generic.ListView):
     queryset = (
         Car.objects.all()
         .select_related("manufacturer")
-        .prefetch_related("drivers")
     )
 
 
 class CarDetailView(LoginRequiredMixin, generic.DetailView):
     model = Car
+    queryset = (
+        Car.objects.all()
+        .prefetch_related("drivers")
+    )
 
     def post(self, request, *args, **kwargs):
         car = self.get_object()
@@ -90,6 +93,7 @@ class CarCreateView(LoginRequiredMixin, generic.CreateView):
 class CarUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Car
     success_url = reverse_lazy("taxi:car-list")
+    fields = "__all__"
 
 
 class CarDeleteView(LoginRequiredMixin, generic.DeleteView):
