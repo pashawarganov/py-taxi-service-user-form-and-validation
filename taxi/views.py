@@ -57,15 +57,12 @@ class ManufacturerDeleteView(LoginRequiredMixin, generic.DeleteView):
 class CarListView(LoginRequiredMixin, generic.ListView):
     model = Car
     paginate_by = 5
-    queryset = (Car.objects.select_related("manufacturer"))
+    queryset = Car.objects.select_related("manufacturer")
 
 
 class CarDetailView(LoginRequiredMixin, generic.DetailView):
     model = Car
-    queryset = (
-        Car.objects.all()
-        .prefetch_related("drivers")
-    )
+    queryset = Car.objects.prefetch_related("drivers")
 
     def post(self, request, *args, **kwargs):
         car = self.get_object()
